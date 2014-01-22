@@ -1,3 +1,4 @@
+require 'scraperwiki'
 require "open-uri"
 require 'nokogiri'
 require "scrapers/ruby_pdf_helper"
@@ -26,7 +27,7 @@ doc.search('page').each do |p|
         puts row[5]
       end
 
-      if (ScraperWiki.select("* from swdata where `council_reference`='#{record['council_reference']}'").empty? rescue true)
+      if (ScraperWiki.select("* from data where `council_reference`='#{record['council_reference']}'").empty? rescue true)
         ScraperWiki.save_sqlite(['council_reference'], record)
       else
         puts "Skipping already saved record " + record['council_reference']
