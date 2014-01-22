@@ -1,7 +1,7 @@
 require 'scraperwiki'
 require "open-uri"
 require 'nokogiri'
-require "ruby_pdf_helper/scraper"
+require File.dirname(__FILE__) + "/ruby_pdf_helper/scraper"
 
 info_url = "http://daps.planning.wa.gov.au/8.asp"
 url = "http://daps.planning.wa.gov.au/data/Current%20DAP%20Applications/Current%20DAP%20Applications.pdf"
