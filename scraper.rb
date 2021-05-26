@@ -32,4 +32,4 @@
 #   end
 # end
 
-puts "Scraper currently commented out to reduce noise"
+puts "Scraper is broken. Code is commented out to reduce noise"
