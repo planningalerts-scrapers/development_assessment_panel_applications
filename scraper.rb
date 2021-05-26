@@ -31,3 +31,5 @@
 #     end
 #   end
 # end
+
+puts "Scraper currently commented out to reduce noise"
