@@ -1,0 +1,8 @@
+bs4
+install-jdk
+pandas
+requests
+selenium
+splinter>=0.7.3
+SQLAlchemy
+tabula-py==2.2.0
