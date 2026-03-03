@@ -7,6 +7,10 @@ Add any issues to https://github.com/planningalerts-scrapers/issues/issues
 
   bundle exec ruby scraper.rb
 
-## To run style and coding checks
+## Developing
+
+After cloning the repo to your local system, you will also need to run:
+
+    git submodule update --init
 
 
