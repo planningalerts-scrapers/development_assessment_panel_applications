@@ -66,26 +66,6 @@ class Scraper
     puts "Finished! Processed #{count} records."
   end
 
-  #   puts "Scanning document to extract pages ..."
-  #   page_no = 0
-  #   doc.search('page').each do |p|
-  #     page_no += 1
-  #     puts "Scanning page #{page_no} for table rows ..."
-  #
-  #     text_rows = p.search('text')
-  #     # returns columns =
-  #     # Array:
-  #     #   {
-  #     #     left: left value (integer)
-  #     #     name: "Name of column"
-  #     #     width: max width of heading for diagnostic purposes
-  #     # }
-  #     # data_rows are the text_rows excluding the text entries that where headings and any above
-  #
-  #     columns, data_rows = PdfDocument.extract_headings(text_rows)
-  #
-  #     PdfDocument.extract_table_from_pdf_text(p.search('text'), COLUMNS).each do |row|
-
   #     end
   #   end
   #   puts "",
