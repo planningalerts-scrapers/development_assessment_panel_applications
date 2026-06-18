@@ -62,8 +62,10 @@ Execution time ~ 5 seconds
 
 ## To check for security updates
 
-    gem install bundler-audit
-    bundle-audit
+As well as GitHub's [Dependabot](https://dependabot.com/) you can use the following commmands locally to check for security vulnerabilities:
+
+    bundle exec bundle-audit
+    bundle exec ruby_audit
 
 ## Development
 

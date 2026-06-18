@@ -14,3 +14,8 @@ gem "scraperwiki", git: "https://github.com/openaustralia/scraperwiki-ruby.git",
 gem "simplecov", "~> 0.18.0"
 gem "simplecov-console"
 gem "sqlite3", "~> 1.6.3"
+
+# Security audit gems
+gem "bundler-audit"
+gem "ruby_audit"
+
