@@ -23,7 +23,7 @@ class PdfDocument
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
         # Run in a temp dir so the extracted images are discarded
-        command = "/usr/bin/pdftohtml -xml -enc UTF-8 -noframes #{src.path} #{dst.path}"
+        command = "pdftohtml -xml -enc UTF-8 -noframes #{src.path} #{dst.path}"
         puts "Running pdftohtml to convert pdf to xml pages..."
         # Outputs page numbers read ...
         system(command)
