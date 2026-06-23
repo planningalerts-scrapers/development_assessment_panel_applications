@@ -26,7 +26,7 @@ class PdfDocument
         command = "pdftohtml -xml -enc UTF-8 -noframes #{src.path} #{dst.path}"
         puts "Running pdftohtml to convert pdf to xml pages..."
         # Outputs page numbers read ...
-        system(command)
+        raise "pdftohtml failed (command not found or error)" unless system(command)
       end
     end
 
