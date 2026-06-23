@@ -1,35 +1,77 @@
-# require 'scraperwiki'
-# require "open-uri"
-# require 'nokogiri'
-# require File.dirname(__FILE__) + "/ruby_pdf_helper/scraper"
-#
-# info_url = "http://daps.planning.wa.gov.au/8.asp"
-# url = "http://www.planning.wa.gov.au/daps/data/Current%20DAP%20Applications/Current%20DAP%20Applications.pdf"
-#
-# doc = Nokogiri::XML(PdfHelper.pdftoxml(open(url) {|f| f.read}))
-#
-# doc.search('page').each do |p|
-#   PdfHelper.extract_table_from_pdf_text(p.search('text')).each do |row|
-#     unless row[0] == 'No'
-#
-#       description = row[4] ? row[4].gsub("\n", "") : nil
-#       record = {
-#         "council_reference" => row[0],
-#         "description" => description,
-#         "address" => row[4].split("\n").last + ", WA",
-#         "date_scraped" => Date.today.to_s,
-#         "info_url" => info_url,
-#         "comment_url" => info_url,
-#       }
-#       begin
-#         record["date_received"] = Date.strptime(row[5].gsub("//","/").strip, "%d/%m/%Y").to_s if row[5]
-#       rescue
-#         puts row[5]
-#       end
-#
-#       ScraperWiki.save_sqlite(['council_reference'], record)
-#     end
-#   end
-# end
+#!/usr/bin/env ruby
+# frozen_string_literal: true
 
-puts "Scraper is broken. Code is commented out to reduce noise"
+require "bundler/setup"
+
+require "open-uri"
+require "yaml"
+
+require "nokogiri"
+require "scraperwiki"
+
+require_relative "lib/pdf_document"
+require_relative "lib/pdf_page"
+
+class Scraper
+  INFO_URL = "https://www.planning.wa.gov.au/development-assessment-panels/current-development-assessment-panels-applications-and-information"
+  PDF_URL = "https://www.planning.wa.gov.au/docs/default-source/daps-docs-website/current-applications.pdf"
+
+  REPORTABLE_HEADINGS = ["DAP Panel", "LG Name"].freeze
+
+  def run
+    date_scraped = Date.today.iso8601
+    count = 0
+
+    puts "Retrieving #{PDF_URL} ..."
+    pdf_content = URI.open(PDF_URL).read
+    puts "Parsing as a PdfDocument ..." if ENV['DEBUG']
+    pdf_doc = PdfDocument.new(pdf_content)
+    page_no = 0
+    pdf_doc.pages.each do |page_entry|
+      page_no += 1
+      puts "Processing page# #{page_no}"
+      pdf_page = PdfPage.new(page_entry, page_no == 1)
+      pdf_page.table_data do |data|
+        puts "ROW: #{data.to_yaml}" if ENV["DEBUG"]
+        REPORTABLE_HEADINGS.each do |heading|
+          puts "Section: #{heading}: #{data[heading]&.fetch(:text)}" if data[heading]
+        end
+        council_reference = data["DAP Application Reference Number"]&.fetch(:text)
+        address = data["Property Location"]&.fetch(:text)
+        address = "#{address}, WA" if address && !address.end_with?(" WA")
+        description = data["Application Description"]&.fetch(:text)
+        record = {
+          "council_reference" => council_reference,
+          "description" => description,
+          "address" => address,
+          "date_scraped" => date_scraped,
+          "info_url" => INFO_URL,
+          "comment_url" => INFO_URL,
+        }
+
+        date_received_text = data["Date Application Received"]&.fetch(:text)
+        begin
+          record[:date_received] = Date.parse(date_received_text).iso8601 if date_received_text.to_s != ""
+        rescue StandardError => e
+          puts "Warning: Ignored unparsable date_received: #{date_received_text} with error: #{e}"
+        end
+
+        puts "Saving #{council_reference} - #{address}"
+        ScraperWiki.save_sqlite(["council_reference"], record)
+        puts "RECORD: #{record.inspect}" if ENV["DEBUG"]
+        count += 1
+      end
+      puts "Finished processing page #{page_no}" if ENV["DEBUG"]
+    end
+    puts "Finished! Processed #{count} records."
+  end
+
+  #     end
+  #   end
+  #   puts "",
+  #        "Found #{count} records."
+  # end
+end
+
+# Run the scraper whilst allowing this file to be required in tests without auto-execution
+Scraper.new.run if __FILE__ == $PROGRAM_NAME
